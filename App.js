@@ -7,88 +7,52 @@
  */
 
 import 'react-native-gesture-handler';
-import React, {Component} from 'react';
-import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  ScrollView,
-  FlatList,
-} from 'react-native';
+import React from 'react';
+import {StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import AsyncStorage from '@react-native-community/async-storage';
+import Detail from './Detail';
+import Tracker from './Tracker';
+import Global from './constants/global';
+import ListCountries from './ListCountries';
 
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
 
-function A(props) {
+async function updateDb() {
+  fetch(Global.urlPrimorye)
+    .then(res => res.json())
+    .then(json => AsyncStorage.setItem('@json-prim', JSON.stringify(json)));
+  fetch(Global.urlWordConfirmed)
+    .then(res => res.text())
+    .then(text => AsyncStorage.setItem('@json-confirm', text));
+  fetch(Global.urlWordMortality)
+    .then(res => res.text())
+    .then(text => AsyncStorage.setItem('@json-death', text));
+  fetch(Global.urlWordRecovered)
+    .then(res => res.text())
+    .then(text => AsyncStorage.setItem('@json-recover', text));
+}
+
+function App() {
+  updateDb();
+
+  AsyncStorage.getItem('@json-name').then(item => {
+    if (item === null) {
+      AsyncStorage.setItem('@json-name', 'Primorsky krai');
+    }
+  });
+
   return (
-    <View style={styles.A}>
-      <Text>A</Text>
-      <Button title="Go to B" onPress={() => props.navigation.navigate('B')} />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="covid tracker" component={Tracker} />
+        <Stack.Screen name="choose region" component={ListCountries} />
+        <Stack.Screen name="detail" component={Detail} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-function B(props) {
-  return (
-    <View style={styles.B}>
-      <Tab.Navigator>
-        <Tab.Screen name="C" component={C} />
-        <Tab.Screen name="D" component={D} />
-      </Tab.Navigator>
-    </View>
-  );
-}
-
-function C(props) {
-  return (
-    <View style={styles.yellow}>
-      <Text>C</Text>
-    </View>
-  );
-}
-
-function D(props) {
-  return (
-    <View style={styles.red}>
-      <Text>D</Text>
-    </View>
-  );
-}
-
-class App extends Component {
-  render() {
-    return (
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="A" component={A} />
-          <Stack.Screen name="B" component={B} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    );
-  }
-}
-
-const styles = StyleSheet.create({
-  A: {
-    flex: 1,
-    backgroundColor: 'pink',
-  },
-  B: {
-    flex: 1,
-    backgroundColor: 'blue',
-  },
-  yellow: {
-    flex: 1,
-    backgroundColor: 'yellow',
-  },
-  red: {
-    flex: 1,
-    backgroundColor: 'red',
-  },
-});
+const styles = StyleSheet.create({});
 
 export default App;
