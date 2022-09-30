@@ -33,7 +33,7 @@
     "react-native-svg": "^12.1.0",
     "react-native-vector-icons": "^6.6.0",
     "react-papaparse": "^3.3.0",
-    "recharts": "^1.8.5",
+    "recharts": "^2.1.14",
     "stream": "0.0.2"
   },
   "devDependencies": {
